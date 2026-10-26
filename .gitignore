@@ -18,6 +18,8 @@ node_modules/
 dist/
 coverage/
 npm-debug.log*
+.npm-cache/
+.vite/
 
 # Editors and operating system files
 .vscode/
