@@ -10,6 +10,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 WORKDIR /app
 
+# Apply available Debian security updates in the runtime image before copying application files.
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /install /usr/local
 COPY app ./app
 COPY alembic ./alembic
