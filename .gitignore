@@ -15,6 +15,7 @@ venv/
 
 # Node / Vite
 node_modules/
+.npm-cache/
 dist/
 coverage/
 npm-debug.log*
