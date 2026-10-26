@@ -1,0 +1,336 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2944 >>
+stream
+BT
+/F1 9 Tf
+1 0 0 1 50 815 Tm (TaskFlow - Guide de comprehension - page 1) Tj
+/F2 16 Tf
+1 0 0 1 50 749 Tm (Guide de compréhension - TaskFlow) Tj
+/F1 10 Tf
+1 0 0 1 50 734 Tm (Objectif : comprendre l'application de bout en bout et pouvoir défendre ses choix techniques) Tj
+/F1 10 Tf
+1 0 0 1 50 719 Tm (pendant un entretien.) Tj
+/F1 10 Tf
+1 0 0 1 50 693 Tm (TaskFlow est une application web de gestion de projets et de tâches. Elle possède une) Tj
+/F1 10 Tf
+1 0 0 1 50 678 Tm (interface React, une API FastAPI et une base de données MySQL.) Tj
+/F1 10 Tf
+1 0 0 1 50 652 Tm (Conseil : ne mémorise pas ce document mot à mot. Ouvre les fichiers indiqués, exécute les) Tj
+/F1 10 Tf
+1 0 0 1 50 637 Tm (commandes, puis explique-les avec tes propres mots.) Tj
+/F2 16 Tf
+1 0 0 1 50 605 Tm (1. Vue d'ensemble de l'architecture) Tj
+/F1 10 Tf
+1 0 0 1 50 590 Tm (Navigateur -> frontend React -> Nginx -> API FastAPI -> SQLAlchemy -> MySQL.) Tj
+/F1 10 Tf
+1 0 0 1 50 564 Tm (Le frontend affiche les pages et recueille les actions de l'utilisateur. Le backend décide) Tj
+/F1 10 Tf
+1 0 0 1 50 549 Tm (si une action est autorisée, valide les données et les enregistre. MySQL conserve les) Tj
+/F1 10 Tf
+1 0 0 1 50 534 Tm (données même après le redémarrage des conteneurs.) Tj
+/F1 10 Tf
+1 0 0 1 50 508 Tm (Dans Docker Compose, les services sont frontend, backend et db. Le frontend est accessible) Tj
+/F1 10 Tf
+1 0 0 1 50 493 Tm (sur http://localhost:8080, Swagger sur http://localhost:8001/docs et le contrôle de santé) Tj
+/F1 10 Tf
+1 0 0 1 50 478 Tm (sur http://localhost:8001/health.) Tj
+/F1 10 Tf
+1 0 0 1 50 452 Tm (Le réseau interne isole MySQL : son port n'est pas publié vers le poste hôte. Les autres) Tj
+/F1 10 Tf
+1 0 0 1 50 437 Tm (conteneurs le joignent avec le nom db.) Tj
+/F2 16 Tf
+1 0 0 1 50 405 Tm (2. Exemple complet : créer une tâche) Tj
+/F1 10 Tf
+1 0 0 1 50 390 Tm (1. L'utilisateur se connecte puis sélectionne un projet dans Dashboard.jsx.) Tj
+/F1 10 Tf
+1 0 0 1 50 364 Tm (2. React utilise api\(\) dans frontend/src/api.js pour envoyer une requête POST JSON à) Tj
+/F1 10 Tf
+1 0 0 1 50 349 Tm (/api/v1/projects/{id}/tasks.) Tj
+/F1 10 Tf
+1 0 0 1 50 323 Tm (3. Le jeton JWT est ajouté dans l'en-tête Authorization: Bearer <token>.) Tj
+/F1 10 Tf
+1 0 0 1 50 297 Tm (4. FastAPI dirige la requête vers backend/app/api/routes/tasks.py.) Tj
+/F1 10 Tf
+1 0 0 1 50 271 Tm (5. deps.py vérifie le JWT, identifie l'utilisateur courant et ouvre une session de base de) Tj
+/F1 10 Tf
+1 0 0 1 50 256 Tm (données.) Tj
+/F1 10 Tf
+1 0 0 1 50 230 Tm (6. Le backend vérifie que le projet appartient bien à cet utilisateur. Sinon il répond 404.) Tj
+/F1 10 Tf
+1 0 0 1 50 204 Tm (7. Pydantic valide les champs : titre, statut, priorité et date éventuelle.) Tj
+/F1 10 Tf
+1 0 0 1 50 178 Tm (8. SQLAlchemy écrit la tâche dans MySQL, puis FastAPI répond 201 Created avec du JSON.) Tj
+/F1 10 Tf
+1 0 0 1 50 152 Tm (9. React recharge les données et affiche la nouvelle tâche.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 2778 >>
+stream
+BT
+/F1 9 Tf
+1 0 0 1 50 815 Tm (TaskFlow - Guide de comprehension - page 2) Tj
+/F2 16 Tf
+1 0 0 1 50 749 Tm (3. Backend FastAPI : organisation) Tj
+/F1 10 Tf
+1 0 0 1 50 734 Tm (backend/app/main.py crée l'application FastAPI, configure CORS, les gestionnaires d'erreurs,) Tj
+/F1 10 Tf
+1 0 0 1 50 719 Tm (/health et les routeurs.) Tj
+/F1 10 Tf
+1 0 0 1 50 693 Tm (backend/app/api/routes/auth.py contient l'inscription et la connexion. projects.py gère les) Tj
+/F1 10 Tf
+1 0 0 1 50 678 Tm (projets. tasks.py gère les tâches, les filtres, la recherche et les statistiques.) Tj
+/F1 10 Tf
+1 0 0 1 50 652 Tm (backend/app/api/deps.py contient les dépendances réutilisables : session de base de données) Tj
+/F1 10 Tf
+1 0 0 1 50 637 Tm (et utilisateur courant. C'est important car cela évite de recopier le contrôle de sécurité) Tj
+/F1 10 Tf
+1 0 0 1 50 622 Tm (dans chaque route.) Tj
+/F1 10 Tf
+1 0 0 1 50 596 Tm (backend/app/models contient les modèles SQLAlchemy. User possède plusieurs Project ; Project) Tj
+/F1 10 Tf
+1 0 0 1 50 581 Tm (possède plusieurs Task.) Tj
+/F1 10 Tf
+1 0 0 1 50 555 Tm (backend/app/schemas contient les modèles Pydantic utilisés pour valider les entrées et) Tj
+/F1 10 Tf
+1 0 0 1 50 540 Tm (définir les réponses JSON. Un schéma API n'est pas obligatoirement identique à une table de) Tj
+/F1 10 Tf
+1 0 0 1 50 525 Tm (base de données.) Tj
+/F1 10 Tf
+1 0 0 1 50 499 Tm (backend/app/core/config.py lit les variables d'environnement. backend/app/core/security.py) Tj
+/F1 10 Tf
+1 0 0 1 50 484 Tm (gère le hash des mots de passe et les JWT.) Tj
+/F1 10 Tf
+1 0 0 1 50 458 Tm (backend/alembic contient les migrations. Au démarrage, alembic upgrade head applique le) Tj
+/F1 10 Tf
+1 0 0 1 50 443 Tm (schéma de base de données attendu.) Tj
+/F2 16 Tf
+1 0 0 1 50 411 Tm (4. Authentification et autorisation) Tj
+/F1 10 Tf
+1 0 0 1 50 396 Tm (Authentification : vérifier qui est l'utilisateur. Lors de la connexion, le mot de passe) Tj
+/F1 10 Tf
+1 0 0 1 50 381 Tm (fourni est comparé à son hash BCrypt stocké. Si la vérification réussit, l'API produit un) Tj
+/F1 10 Tf
+1 0 0 1 50 366 Tm (JWT signé.) Tj
+/F1 10 Tf
+1 0 0 1 50 340 Tm (Autorisation : vérifier ce que cet utilisateur peut faire. Avant de lire, modifier ou) Tj
+/F1 10 Tf
+1 0 0 1 50 325 Tm (supprimer un projet ou une tâche, le backend filtre avec l'identifiant du propriétaire du) Tj
+/F1 10 Tf
+1 0 0 1 50 310 Tm (projet.) Tj
+/F1 10 Tf
+1 0 0 1 50 284 Tm (Phrase d'entretien : l'authentification prouve l'identité ; l'autorisation vérifie les) Tj
+/F1 10 Tf
+1 0 0 1 50 269 Tm (droits sur une ressource.) Tj
+/F1 10 Tf
+1 0 0 1 50 243 Tm (Pourquoi répondre 404 pour une ressource d'un autre utilisateur ? Cela évite aussi de) Tj
+/F1 10 Tf
+1 0 0 1 50 228 Tm (confirmer qu'une ressource appartenant à quelqu'un d'autre existe.) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 2977 >>
+stream
+BT
+/F1 9 Tf
+1 0 0 1 50 815 Tm (TaskFlow - Guide de comprehension - page 3) Tj
+/F2 16 Tf
+1 0 0 1 50 749 Tm (5. Frontend React et Vite) Tj
+/F1 10 Tf
+1 0 0 1 50 734 Tm (React construit l'interface avec des composants. App.jsx définit les routes Login, Register) Tj
+/F1 10 Tf
+1 0 0 1 50 719 Tm (et Dashboard. ProtectedRoute redirige vers /login si aucun jeton n'est présent.) Tj
+/F1 10 Tf
+1 0 0 1 50 693 Tm (auth.jsx stocke l'état de connexion et le jeton. api.js centralise fetch : URL API, en-têtes) Tj
+/F1 10 Tf
+1 0 0 1 50 678 Tm (JSON, jeton Bearer et gestion uniforme des erreurs.) Tj
+/F1 10 Tf
+1 0 0 1 50 652 Tm (Dashboard.jsx contient les états React pour les projets, les tâches, les formulaires, les) Tj
+/F1 10 Tf
+1 0 0 1 50 637 Tm (filtres, le chargement et les erreurs. components.jsx regroupe les composants visuels) Tj
+/F1 10 Tf
+1 0 0 1 50 622 Tm (réutilisables.) Tj
+/F1 10 Tf
+1 0 0 1 50 596 Tm (Vite n'est pas React. Vite est l'outil qui lance rapidement le serveur de développement et) Tj
+/F1 10 Tf
+1 0 0 1 50 581 Tm (produit les fichiers statiques optimisés pour la production.) Tj
+/F2 16 Tf
+1 0 0 1 50 549 Tm (6. Défendre le choix FastAPI) Tj
+/F1 10 Tf
+1 0 0 1 50 534 Tm (Réponse courte : j'ai choisi FastAPI pour construire une API REST moderne, lisible et) Tj
+/F1 10 Tf
+1 0 0 1 50 519 Tm (rapidement testable. Il s'intègre à Pydantic pour la validation, à SQLAlchemy pour MySQL, et) Tj
+/F1 10 Tf
+1 0 0 1 50 504 Tm (génère automatiquement OpenAPI et Swagger.) Tj
+/F1 10 Tf
+1 0 0 1 50 478 Tm (Avantages concrets dans ce projet : validation typée, dépendances pour l'authentification et) Tj
+/F1 10 Tf
+1 0 0 1 50 463 Tm (la base de données, réponses HTTP claires, documentation interactive à /docs, tests simples) Tj
+/F1 10 Tf
+1 0 0 1 50 448 Tm (avec pytest.) Tj
+/F1 10 Tf
+1 0 0 1 50 422 Tm (Limite honnête : sur un système beaucoup plus grand, j'ajouterais par exemple la limitation) Tj
+/F1 10 Tf
+1 0 0 1 50 407 Tm (de débit, du cache, une observabilité plus complète, des tâches asynchrones et une) Tj
+/F1 10 Tf
+1 0 0 1 50 392 Tm (séparation plus poussée des domaines métier.) Tj
+/F2 16 Tf
+1 0 0 1 50 360 Tm (7. Défendre le choix React + Vite) Tj
+/F1 10 Tf
+1 0 0 1 50 345 Tm (Réponse courte : TaskFlow est une interface interactive avec formulaires, filtres, statut de) Tj
+/F1 10 Tf
+1 0 0 1 50 330 Tm (connexion, chargement et données qui évoluent sans recharger toute la page. React est adapté) Tj
+/F1 10 Tf
+1 0 0 1 50 315 Tm (à cette gestion d'état par composants.) Tj
+/F1 10 Tf
+1 0 0 1 50 289 Tm (Vite réduit la configuration et fournit un démarrage rapide en développement ainsi qu'un) Tj
+/F1 10 Tf
+1 0 0 1 50 274 Tm (build statique optimisé. En production, Nginx sert ce build, ce qui est léger et fiable.) Tj
+/F1 10 Tf
+1 0 0 1 50 248 Tm (Limite honnête : React introduit davantage de logique côté client qu'une page HTML rendue) Tj
+/F1 10 Tf
+1 0 0 1 50 233 Tm (côté serveur. Ici ce compromis est justifié par l'expérience de tableau de bord dynamique.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 2368 >>
+stream
+BT
+/F1 9 Tf
+1 0 0 1 50 815 Tm (TaskFlow - Guide de comprehension - page 4) Tj
+/F2 16 Tf
+1 0 0 1 50 749 Tm (8. Docker, CI/CD et qualité) Tj
+/F1 10 Tf
+1 0 0 1 50 734 Tm (docker-compose.yml orchestre les trois services. Les health checks permettent à Docker de) Tj
+/F1 10 Tf
+1 0 0 1 50 719 Tm (savoir si MySQL, le backend et le frontend sont prêts. Le volume mysql_data garde les) Tj
+/F1 10 Tf
+1 0 0 1 50 704 Tm (données entre les redémarrages.) Tj
+/F1 10 Tf
+1 0 0 1 50 678 Tm (Le backend utilise un Dockerfile Python et lance les migrations avant Uvicorn. Le frontend) Tj
+/F1 10 Tf
+1 0 0 1 50 663 Tm (utilise un build Node puis Nginx pour servir les fichiers produits.) Tj
+/F1 10 Tf
+1 0 0 1 50 637 Tm (Les tests backend couvrent les unités, l'API, l'authentification, l'autorisation et les) Tj
+/F1 10 Tf
+1 0 0 1 50 622 Tm (entrées invalides. Le frontend possède au moins un test de connexion. Le smoke test vérifie) Tj
+/F1 10 Tf
+1 0 0 1 50 607 Tm (le parcours local après Docker.) Tj
+/F1 10 Tf
+1 0 0 1 50 581 Tm (GitHub Actions répète lint, tests et build sur les pull requests. L'objectif est d'empêcher) Tj
+/F1 10 Tf
+1 0 0 1 50 566 Tm (la publication d'une version si les vérifications échouent.) Tj
+/F2 16 Tf
+1 0 0 1 50 534 Tm (9. Questions fréquentes pour la soutenance) Tj
+/F1 10 Tf
+1 0 0 1 50 519 Tm (Pourquoi un ORM ? SQLAlchemy rend les modèles lisibles et produit des requêtes paramétrées,) Tj
+/F1 10 Tf
+1 0 0 1 50 504 Tm (ce qui aide à prévenir l'injection SQL.) Tj
+/F1 10 Tf
+1 0 0 1 50 478 Tm (Pourquoi Alembic ? Les migrations versionnent le schéma. Un autre environnement peut recréer) Tj
+/F1 10 Tf
+1 0 0 1 50 463 Tm (la même base sans créer des tables manuellement.) Tj
+/F1 10 Tf
+1 0 0 1 50 437 Tm (Pourquoi MySQL n'est pas exposé ? La base est privée dans le réseau Docker interne ; cela) Tj
+/F1 10 Tf
+1 0 0 1 50 422 Tm (réduit la surface d'attaque.) Tj
+/F1 10 Tf
+1 0 0 1 50 396 Tm (Que contient le JWT ? Une identité signée et une expiration. Le frontend le transmet ; le) Tj
+/F1 10 Tf
+1 0 0 1 50 381 Tm (backend le valide avant une route protégée.) Tj
+/F1 10 Tf
+1 0 0 1 50 355 Tm (Comment revenir en arrière après une mauvaise livraison ? Revenir à une image versionnée) Tj
+/F1 10 Tf
+1 0 0 1 50 340 Tm (connue ou à un tag Git, puis redéployer l'image correspondante. Le plan détaillé est dans) Tj
+/F1 10 Tf
+1 0 0 1 50 325 Tm (CLOUD_DEPLOYMENT.md.) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 1246 >>
+stream
+BT
+/F1 9 Tf
+1 0 0 1 50 815 Tm (TaskFlow - Guide de comprehension - page 5) Tj
+/F2 16 Tf
+1 0 0 1 50 749 Tm (10. Plan personnel de révision) Tj
+/F1 10 Tf
+1 0 0 1 50 734 Tm (1. Ouvre main.py, deps.py, security.py, projects.py et tasks.py. Explique leur rôle sans) Tj
+/F1 10 Tf
+1 0 0 1 50 719 Tm (regarder ce guide.) Tj
+/F1 10 Tf
+1 0 0 1 50 693 Tm (2. Crée deux comptes. Avec Swagger, vérifie qu'un compte ne peut pas accéder aux projets de) Tj
+/F1 10 Tf
+1 0 0 1 50 678 Tm (l'autre.) Tj
+/F1 10 Tf
+1 0 0 1 50 652 Tm (3. Lance docker compose up -d --build, puis explique chaque service et chaque health check.) Tj
+/F1 10 Tf
+1 0 0 1 50 626 Tm (4. Lance pytest, ruff, npm run lint, npm run test et npm run build. Lis au moins un test) Tj
+/F1 10 Tf
+1 0 0 1 50 611 Tm (backend et Login.test.jsx.) Tj
+/F1 10 Tf
+1 0 0 1 50 585 Tm (5. Prépare une démonstration de 5 à 10 minutes : inscription, projet, tâche, filtre,) Tj
+/F1 10 Tf
+1 0 0 1 50 570 Tm (Swagger, persistance MySQL, tests, Docker, GitHub Actions et plan de déploiement.) Tj
+/F1 10 Tf
+1 0 0 1 50 544 Tm (6. Sois transparent sur l'aide IA : explique ce que tu as vérifié, adapté et compris. Ne) Tj
+/F1 10 Tf
+1 0 0 1 50 529 Tm (prétends jamais connaître un détail que tu ne peux pas expliquer.) Tj
+ET
+endstream
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000147 00000 n 
+0000000217 00000 n 
+0000000292 00000 n 
+0000000428 00000 n 
+0000003424 00000 n 
+0000003560 00000 n 
+0000006390 00000 n 
+0000006527 00000 n 
+0000009557 00000 n 
+0000009695 00000 n 
+0000012116 00000 n 
+0000012254 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+13553
+%%EOF
