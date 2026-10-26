@@ -1,6 +1,6 @@
 # Testing and evidence
 
-Run commands from the repository root unless a `Set-Location` is shown. Local results below are observations from 2026-10-26, not a claim that GitHub Actions or a hosted environment has passed.
+Run commands from the repository root unless a `Set-Location` is shown. Local results below are observations from 2026-10-26. Remote CI, release, and staging evidence is recorded separately below.
 
 ## Local checks (Windows PowerShell)
 
@@ -30,11 +30,17 @@ For a clean host setup, create a Python 3.12 environment and install `backend/re
 
 The pytest fixtures use in-memory SQLite for fast isolated behavior tests. They do **not** prove MySQL-specific behavior. The CI backend job starts MySQL 8 and applies Alembic migrations against it; the Compose smoke test exercises the actual MySQL-backed API. More direct MySQL API integration tests would strengthen coverage.
 
-## CI and security checks to capture
+## Verified CI, release, and staging evidence
 
 The [CI workflow](.github/workflows/ci.yml) runs on pull requests and pushes to `develop`: backend lint/tests/MySQL migration/`pip-audit`, frontend lint/test/build/`npm audit`, both Docker builds with Trivy HIGH/CRITICAL gates, and Gitleaks. [release.yml](.github/workflows/release.yml) calls CI before GHCR publishing. [staging.yml](.github/workflows/staging.yml) is a manually triggered, disposable-runner smoke test of released images.
 
-**Pending evidence:** save links to a successful PR CI run, tag release run, and staging simulation in the submission record once they actually exist. Trivy, Gitleaks, and `pip-audit` were not verified locally; local `pip-audit` installation stalled. An audit or scan failure is not a pass and should block release until investigated. Record finding ID, affected version, remediation, and a rerun in [SECURITY.md](SECURITY.md).
+| Evidence | Result |
+| --- | --- |
+| [Final release PR CI](https://github.com/nouraboussaoud/taskflow/actions/runs/40392702732) | Passed: backend lint/tests/MySQL migration/`pip-audit`, frontend lint/tests/build/`npm audit`, Trivy scans for both images, and Gitleaks. |
+| [v1.0.0 release workflow](https://github.com/nouraboussaoud/taskflow/actions/runs/40393130519) | Passed: repeated CI gate, GHCR publication of both images, and GitHub Release creation. |
+| [v1.0.0 staging simulation](https://github.com/nouraboussaoud/taskflow/actions/runs/40394756997) | Passed: pulled released images, started Compose services, waited for health, and completed the Nginx-to-API smoke test. |
+
+Trivy, Gitleaks, and `pip-audit` were not run as standalone local commands; the linked successful GitHub CI runs are the evidence for those gates. An audit or scan failure is not a pass and should block release until investigated. Record finding ID, affected version, remediation, and a rerun in [SECURITY.md](SECURITY.md).
 
 Useful local rerun sequence:
 
