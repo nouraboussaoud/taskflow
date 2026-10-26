@@ -1,8 +1,9 @@
 from typing import Annotated
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jwt import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -32,7 +33,7 @@ def get_current_user(
             algorithms=[settings.jwt_algorithm],
         )
         user_id = int(payload.get("sub", ""))
-    except (JWTError, TypeError, ValueError):
+    except (InvalidTokenError, TypeError, ValueError):
         raise unauthorized from None
 
     user = db.scalar(select(User).where(User.id == user_id))

@@ -16,12 +16,13 @@ This is a transparent assessment-level security record, not a claim of a product
 | Finding/check | Status on 2026-10-26 | Action |
 | --- | --- | --- |
 | Old frontend package audit reported 10 findings, including high/critical React Router/Vitest-chain issues | Remediated locally by updating React Router, Vite, Vitest, plugin, and lockfile; `npm audit --audit-level=high` then reported 0 vulnerabilities. | Confirm CI on a clean runner; continue routine updates. |
-| Backend Python dependency audit | Unknown. Local `pip-audit` install stalled; CI job has the command. | Run CI and review every finding before release. |
-| Trivy backend/frontend image scan | Unknown; workflow configured, not run locally. | Review HIGH/CRITICAL findings and rebuild with fixed dependencies/base images. |
+| Backend Trivy scan | Failed on CI before release. It reported HIGH/CRITICAL findings in `python-jose`/its dependency chain, old Starlette, and the Debian base image. | On branch `fix/security-dependencies`, replace `python-jose` with PyJWT, update FastAPI/Starlette, and use the Bookworm Python slim base. Require a clean CI rerun before merge. |
+| Backend Python dependency audit | Local audit-tool installation completed, but advisory lookup did not return in this environment. | CI runs `pip-audit`; record its exact result and remediate any fixable finding before release. |
+| Trivy backend/frontend image scan after remediation | Pending. The CI gate still fails HIGH/CRITICAL vulnerabilities when a vendor fix exists; it skips only findings with no available upstream fix. | Review the PR run, document any remaining unfixed operating-system risk, and do not release if a fixable finding remains. |
 | Gitleaks repository history scan | Unknown; workflow configured, not run locally. | Review alerts; rotate any exposed real secret immediately. |
 | Hosted TLS/firewall/backup checks | Not applicable yet; no server deployment verified. | Follow [CLOUD_DEPLOYMENT.md](CLOUD_DEPLOYMENT.md) before any real exposure. |
 
-The initial npm advisories were identified by `npm audit`; the post-update 0-vulnerability result is only a point-in-time registry report, not proof that the code is vulnerability-free. Security check failures must not be bypassed merely to publish.
+The initial npm advisories were identified by `npm audit`; the post-update 0-vulnerability result is only a point-in-time registry report, not proof that the code is vulnerability-free. Security check failures must not be bypassed merely to publish. The Trivy `ignore-unfixed` setting does not disable the severity gate: it prevents release from being blocked only by upstream findings for which no vendor patch exists. All fixable HIGH/CRITICAL findings still fail the workflow.
 
 ## Remaining risks and next steps
 

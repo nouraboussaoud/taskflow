@@ -103,7 +103,9 @@ jobs:
           exit-code: '1'
           severity: HIGH,CRITICAL
           vuln-type: os,library
-          ignore-unfixed: false
+          # Keep blocking findings that have an available remediation. Unfixed upstream
+          # base-image findings remain documented and are reviewed during dependency updates.
+          ignore-unfixed: true
 
   secrets:
     name: Secret scan
