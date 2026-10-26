@@ -7,15 +7,15 @@ Run commands from the repository root unless a `Set-Location` is shown. Local re
 | Check | Command | Observed result |
 | --- | --- | --- |
 | Backend lint | `Set-Location backend; .\.venv\Scripts\ruff.exe check .` | Passed. |
-| Backend unit/API tests | `Set-Location backend; .\.venv\Scripts\pytest.exe -q` | 10 passed; 28 third-party deprecation warnings on local Python 3.14. CI targets Python 3.12. |
+| Backend unit/API tests | `Set-Location backend; .\.venv\Scripts\pytest.exe -q -p no:cacheprovider` | 10 passed; 2 third-party deprecation warnings on local Python 3.14. CI targets Python 3.12. |
 | Frontend lint | `Set-Location frontend; npm.cmd run lint` | Passed after Phase 6 dependency update. |
-| Frontend test | `Set-Location frontend; npm.cmd test` | 1 test passed. |
+| Frontend test | `Set-Location frontend; npm.cmd test -- --run` | 3 tests passed in 1 test file. |
 | Frontend production build | `Set-Location frontend; npm.cmd run build` | Passed with Vite 8.3.5. |
 | npm dependency audit | `Set-Location frontend; npm.cmd audit --audit-level=high` | 0 vulnerabilities reported after dependency update. |
 | Frontend Docker build | `docker build -t taskflow-frontend:phase6 ./frontend` | Passed locally. |
 | Compose config | `docker compose config --quiet` | Passed during Phase 5; staging override config also validated with example image variables. |
-| Full local stack | `docker compose up -d --build; docker compose ps` | Phase 5 run reported all three services healthy. |
-| API smoke | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\smoke_test.ps1` | Phase 5 run passed health, registration, login, project, task. |
+| Full local stack | `docker compose up -d --build; docker compose ps` | A previous Phase 5 run reported all three services healthy. The 2026-10-26 recheck could not access the local Windows Docker daemon (`//./pipe/docker_engine`: access denied), so it is not a fresh runtime confirmation. |
+| API smoke | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\smoke_test.ps1` | Phase 5 run passed health, registration, login, project, task. Re-run after restoring Docker-daemon access. |
 
 For a clean host setup, create a Python 3.12 environment and install `backend/requirements-dev.txt`, then run backend commands from `backend`. Existing local `.venv` may use a different Python version; do not claim exact CI parity from a host-only run. The smoke test creates persistent test records in the Compose MySQL volume.
 

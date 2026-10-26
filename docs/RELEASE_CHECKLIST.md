@@ -1,10 +1,10 @@
 # TaskFlow release and submission checklist
 
-This is an execution checklist, not a record of a completed release. As checked locally on 2026-10-26: PR #1 and PR #2 are merged into `develop`; `main` still points to the initial MySQL foundation; no local `v*` tags exist; Phase 7 docs are uncommitted. Recheck GitHub before acting because remote state can change.
+This is an execution checklist, not a record of a completed release. As checked locally on 2026-10-26: PRs #1–#4 are merged into `develop`; `main` still points to the initial MySQL foundation; no local `v*` tags exist; and the final source still needs to be merged to `main`. Recheck GitHub before acting because remote state can change.
 
 ## 1. Finish and review the branches
 
-- [ ] Restore or deliberately recreate `AI_USAGE.md` and `AI_USAGE_LOG.md` if they were removed intentionally; the assessment requires them and README currently links to them. Then commit the Phase 7 docs on `feature/docs` and push the branch. Keep the unrelated untracked `backend/app/schemas/errors.py` out of the commit unless you deliberately review and include it.
+- [x] `AI_USAGE.md` and `AI_USAGE_LOG.md` exist and are linked from README. The API error schema has been deliberately reviewed and included in the OpenAPI response documentation.
 - [ ] Open a PR from `feature/ci` into `develop`. Review the first GitHub CI run: backend tests and MySQL migration, frontend checks, both image builds/Trivy scans, pip/npm audits, and Gitleaks. Fix findings; do not mark skipped or failed scans as passing.
 - [ ] Open a PR from `feature/docs` into `develop` after CI changes are merged, or update that branch from `develop` first. Check rendered Markdown links and commands in GitHub.
 - [ ] Confirm the earlier meaningful backend PRs (#1 and #2) and the new PR links in the submission. Ask for review where available; merge only when required checks pass. GitHub branch protection can require those checks on `develop` and `main` [if configured](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
