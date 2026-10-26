@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 
@@ -19,7 +20,8 @@ class Settings(BaseSettings):
     db_port: int = 3306
     db_name: str = "taskflow"
     db_user: str = "taskflow_app"
-    db_password: str
+    # The app connects as MYSQL_USER; DB_PASSWORD can override it when needed.
+    db_password: str = Field(validation_alias=AliasChoices("DB_PASSWORD", "MYSQL_PASSWORD"))
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
