@@ -20,7 +20,13 @@ export async function api(path, { token, method = "GET", body, signal } = {}) {
 
   if (response.status === 204) return null;
 
-  const payload = await response.json().catch(() => null);
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    if (response.ok) throw new ApiError("The server returned an invalid response.", response.status);
+    payload = null;
+  }
   if (!response.ok) {
     throw new ApiError(payload?.error?.message || "The request could not be completed.", response.status);
   }

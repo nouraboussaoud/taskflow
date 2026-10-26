@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { api } from "../api";
+import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
 import { ErrorMessage, Loading, PriorityBadge, StatusBadge } from "../components";
 
@@ -34,10 +34,18 @@ export function Dashboard() {
   const [reloadTasks, setReloadTasks] = useState(0);
   const [error, setError] = useState("");
 
-  const request = useCallback((path, options = {}) => api(path, { token, ...options }), [token]);
+  const request = useCallback(async (path, options = {}) => {
+    try {
+      return await api(path, { token, ...options });
+    } catch (requestError) {
+      if (requestError instanceof ApiError && requestError.status === 401) signOut();
+      throw requestError;
+    }
+  }, [token, signOut]);
 
   const refreshDashboard = useCallback(async () => {
     const [projectData, statsData] = await Promise.all([request("/projects"), request("/dashboard/stats")]);
+    if (!Array.isArray(projectData)) throw new Error("The server returned an invalid project list.");
     setProjects(projectData);
     setStats(statsData);
     setSelectedProjectId((current) =>
@@ -75,9 +83,14 @@ export function Dashboard() {
     Object.entries(filters).forEach(([key, value]) => { if (value) params.set(key, value); });
     setTasksLoading(true);
     request(`/projects/${selectedProjectId}/tasks?${params}`, { signal: controller.signal })
-      .then((data) => { setTasks(data); setTasksLoading(false); })
+      .then((data) => {
+        if (!Array.isArray(data)) throw new Error("The server returned an invalid task list.");
+        setTasks(data);
+        setTasksLoading(false);
+      })
       .catch((requestError) => {
         if (requestError.name !== "AbortError") {
+          setTasks([]);
           setError(requestError.message);
           setTasksLoading(false);
         }
@@ -147,6 +160,8 @@ export function Dashboard() {
 
   if (loading) return <main className="page"><Loading label="Loading your workspace…" /></main>;
 
+  const visibleTasks = Array.isArray(tasks) ? tasks : [];
+
   return (
     <main className="page">
       <header className="topbar">
@@ -196,9 +211,9 @@ export function Dashboard() {
             </form>
             <div className="filters"><input placeholder="Search tasks" value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} /><select value={filters.status_filter} onChange={(event) => setFilters({ ...filters, status_filter: event.target.value })}><option value="">All statuses</option><option value="todo">To do</option><option value="in_progress">In progress</option><option value="done">Done</option></select><select value={filters.priority} onChange={(event) => setFilters({ ...filters, priority: event.target.value })}><option value="">All priorities</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
             <div className="task-list">
-              {tasksLoading ? <Loading label="Loading tasks..." /> : tasks.length === 0 ? (
+              {tasksLoading ? <Loading label="Loading tasks..." /> : visibleTasks.length === 0 ? (
                 <p className="empty-state">No matching tasks.</p>
-              ) : tasks.map((task) => (
+              ) : visibleTasks.map((task) => (
                 <article className="task-card" key={task.id}>
                   <div>
                     <h3>{task.title}</h3>
