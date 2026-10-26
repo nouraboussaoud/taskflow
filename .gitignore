@@ -1,0 +1,31 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node / Vite
+node_modules/
+dist/
+coverage/
+npm-debug.log*
+
+# Editors and operating system files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
+
+# Docker / local tooling
+*.pid
+
