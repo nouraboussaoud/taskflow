@@ -51,7 +51,14 @@ jobs:
       - name: Pull published images
         run: docker compose -f docker-compose.yml -f docker-compose.staging.yml pull backend frontend db
       - name: Start and wait for healthy services
-        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --no-build --wait
+        # Name all services explicitly: `--no-build` must never omit MySQL from
+        # the staging stack, because the API health check requires it.
+        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --no-build --wait db backend frontend
+      - name: Capture service diagnostics on startup failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.staging.yml ps --all
+          docker compose -f docker-compose.yml -f docker-compose.staging.yml logs --tail=150 db backend frontend
       - name: Smoke test through Nginx
         run: bash scripts/smoke_test.sh
       - name: Write run summary
