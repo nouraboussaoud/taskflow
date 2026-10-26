@@ -11,6 +11,7 @@ from app.api.routes import auth, projects, tasks
 from app.core.config import settings
 from app.core.logging import configure_logging
 from app.db.session import SessionLocal
+from app.schemas.errors import ErrorResponse
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -24,6 +25,11 @@ app = FastAPI(
     ),
     openapi_url="/openapi.json",
     docs_url="/docs",
+    responses={
+        401: {"model": ErrorResponse, "description": "Missing, invalid, or expired bearer token."},
+        422: {"model": ErrorResponse, "description": "Request validation failed."},
+        500: {"model": ErrorResponse, "description": "Unexpected server error."},
+    },
 )
 app.add_middleware(
     CORSMiddleware,
