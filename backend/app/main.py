@@ -62,8 +62,16 @@ async def http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.exception("Unhandled request error", extra={"path": request.url.path})
+    # Starlette's outer error middleware sends 500 responses outside CORSMiddleware.
+    # Add the configured origin so the browser can show the real API error.
+    headers = None
+    if request.headers.get("origin") == settings.frontend_origin:
+        headers = {"Access-Control-Allow-Origin": settings.frontend_origin, "Vary": "Origin"}
     return error_response(
-        status.HTTP_500_INTERNAL_SERVER_ERROR, "internal_error", "Internal server error"
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "internal_error",
+        "Internal server error",
+        headers=headers,
     )
 
 

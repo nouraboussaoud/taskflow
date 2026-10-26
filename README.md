@@ -2,41 +2,42 @@
 
 TaskFlow is a secure task and project management application built as a junior Cloud, DevOps, and Full-Stack engineering assessment.
 
-## Phase 1: local database foundation
-
-This phase starts MySQL 8 with persistent storage. Application services will be added in later phases.
+## Local setup
 
 ### Prerequisites
 
 - Docker Desktop running
 - PowerShell 7+ (Windows PowerShell also works)
 
-### Start MySQL
+### Start all three services
 
 ```powershell
-Copy-Item .env.example .env
-docker compose up -d
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Edit .env and replace the example passwords and JWT secret first.
+docker compose up -d --build
 docker compose ps
-docker compose logs db
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\smoke_test.ps1
 ```
 
-The database intentionally has no published host port. Future backend containers will connect through Docker's internal `taskflow-internal` network using the hostname `db`.
+Open the app at `http://localhost:8080` and Swagger UI at `http://localhost:8001/docs`. Nginx proxies `/api/v1` and `/health` to the backend. The backend applies Alembic migrations before serving. MySQL uses the persistent `mysql_data` volume and has no published host port.
 
-### Stop MySQL
+The smoke script creates a unique test user, project, and task in the local database. On Linux, run `bash scripts/smoke_test.sh` instead.
+
+### Stop the stack
 
 ```powershell
 docker compose down
 ```
 
-`docker compose down` preserves the `mysql_data` volume. To remove all local database data deliberately, run `docker compose down -v`.
+`docker compose down` preserves `mysql_data`. Running `docker compose down -v` deletes that volume and all local TaskFlow data.
 
-## Planned stack
+## Stack
 
 - FastAPI, SQLAlchemy, Alembic, MySQL 8, JWT authentication
 - React + Vite
 - Docker Compose, GitHub Actions, GHCR
 
-## Run the backend and frontend locally
+## Frontend development mode
 
 Start Docker Desktop, then run from the repository root:
 
@@ -45,7 +46,7 @@ docker compose up -d --build backend
 docker compose ps
 ```
 
-The backend applies Alembic migrations before serving. Check `http://localhost:8001/health` and open Swagger UI at `http://localhost:8001/docs`. MySQL remains on a private Docker network with no host port.
+Check `http://localhost:8001/health` and open Swagger UI at `http://localhost:8001/docs`.
 
 In a second PowerShell terminal, run:
 

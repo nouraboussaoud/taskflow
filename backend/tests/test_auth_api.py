@@ -1,4 +1,8 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
+
+from app.main import app
 
 
 def test_register_login_and_reject_duplicate_email(client: TestClient) -> None:
@@ -26,3 +30,18 @@ def test_invalid_login_and_missing_token_return_401(client: TestClient) -> None:
     assert invalid_login.status_code == 401
     assert protected.status_code == 401
     assert protected.headers["www-authenticate"] == "Bearer"
+
+
+def test_unexpected_error_keeps_cors_header_for_configured_origin() -> None:
+    # Simulate an internal failure without writing a user to the test database.
+    with patch("app.api.routes.auth.hash_password", side_effect=RuntimeError("test failure")):
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.post(
+                "/api/v1/auth/register",
+                headers={"Origin": "http://localhost:5173"},
+                json={"email": "test@example.com", "password": "a-safe-test-password"},
+            )
+
+    assert response.status_code == 500
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+    assert response.json()["error"]["code"] == "internal_error"
