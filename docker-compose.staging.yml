@@ -1,0 +1,8 @@
+# Use published images in the temporary GitHub Actions staging simulation.
+# The base file retains build instructions for local development; --no-build
+# in staging.yml makes Compose use only these pulled images.
+services:
+  backend:
+    image: ${TASKFLOW_BACKEND_IMAGE:?Set TASKFLOW_BACKEND_IMAGE}
+  frontend:
+    image: ${TASKFLOW_FRONTEND_IMAGE:?Set TASKFLOW_FRONTEND_IMAGE}

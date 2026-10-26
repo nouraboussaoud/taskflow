@@ -1,0 +1,66 @@
+name: Staging simulation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Existing release tag, for example v1.0.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  staging:
+    name: Pull, run, and smoke-test release images
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate tag and set image references
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          echo "TASKFLOW_BACKEND_IMAGE=ghcr.io/${OWNER,,}/taskflow-backend:${VERSION}" >> "$GITHUB_ENV"
+          echo "TASKFLOW_FRONTEND_IMAGE=ghcr.io/${OWNER,,}/taskflow-frontend:${VERSION}" >> "$GITHUB_ENV"
+      - name: Create temporary CI-only configuration
+        shell: bash
+        run: |
+          umask 077
+          {
+            echo 'MYSQL_DATABASE=taskflow'
+            echo 'MYSQL_USER=taskflow_app'
+            echo "MYSQL_PASSWORD=$(openssl rand -hex 24)"
+            echo "MYSQL_ROOT_PASSWORD=$(openssl rand -hex 24)"
+            echo "JWT_SECRET_KEY=$(openssl rand -hex 32)"
+            echo 'FRONTEND_ORIGIN=http://localhost:8080'
+          } > .env
+      - name: Sign in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate Compose configuration
+        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml config --quiet
+      - name: Pull published images
+        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml pull backend frontend db
+      - name: Start and wait for healthy services
+        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --no-build --wait
+      - name: Smoke test through Nginx
+        run: bash scripts/smoke_test.sh
+      - name: Write run summary
+        if: success()
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          echo "### Staging simulation: ${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Pulled release images, validated Compose, reached healthy services, and passed the API smoke test on this temporary runner.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Stop temporary stack
+        if: ${{ always() && env.TASKFLOW_BACKEND_IMAGE != '' }}
+        run: docker compose -f docker-compose.yml -f docker-compose.staging.yml down
