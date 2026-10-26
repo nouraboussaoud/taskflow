@@ -1,13 +1,12 @@
-from datetime import UTC, datetime
-
 from fastapi import APIRouter, HTTPException, Response, status
-from sqlalchemy import func, select
+from sqlalchemy import select
 
 from app.api.deps import CurrentUser, DbSession
 from app.api.routes.projects import get_owned_project
 from app.models.project import Project
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.task import DashboardStats, TaskCreate, TaskResponse, TaskUpdate
+from app.services.dashboard import calculate_dashboard_stats
 
 router = APIRouter(tags=["tasks"])
 
@@ -82,29 +81,4 @@ def delete_task(task_id: int, current_user: CurrentUser, db: DbSession) -> Respo
 
 @router.get("/dashboard/stats", response_model=DashboardStats)
 def dashboard_stats(current_user: CurrentUser, db: DbSession) -> DashboardStats:
-    owner_tasks = select(Task).join(Project).where(Project.owner_id == current_user.id).subquery()
-    status_counts = dict(
-        db.execute(select(owner_tasks.c.status, func.count()).group_by(owner_tasks.c.status))
-    )
-    priority_counts = dict(
-        db.execute(select(owner_tasks.c.priority, func.count()).group_by(owner_tasks.c.priority))
-    )
-    total_tasks = db.scalar(select(func.count()).select_from(owner_tasks)) or 0
-    overdue_tasks = (
-        db.scalar(
-            select(func.count())
-            .select_from(owner_tasks)
-            # MySQL DATETIME is timezone-naive; normalize UTC before comparing.
-            .where(
-                owner_tasks.c.due_date < datetime.now(UTC).replace(tzinfo=None),
-                owner_tasks.c.status != TaskStatus.DONE,
-            )
-        )
-        or 0
-    )
-    return DashboardStats(
-        total_tasks=total_tasks,
-        overdue_tasks=overdue_tasks,
-        by_status={item: status_counts.get(item, 0) for item in TaskStatus},
-        by_priority={item: priority_counts.get(item, 0) for item in TaskPriority},
-    )
+    return calculate_dashboard_stats(db, current_user.id)
