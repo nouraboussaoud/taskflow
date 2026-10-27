@@ -1,29 +1,29 @@
-# AI usage disclosure
+# AI Usage Disclosure
 
-## Declaration
+I used an AI assistant while building TaskFlow, as the assessment allows. This file says which tool I used and for what. The detailed, dated entries are in [AI_USAGE_LOG.md](AI_USAGE_LOG.md).
 
-AI-assisted tooling was used while building TaskFlow. The author reviewed, adapted, tested, and remains responsible for every submitted change. AI assistance did not replace the author's responsibility to understand, explain, modify, and debug the application.
+AI helped me work faster and learn, but I reviewed, tested and adapted what I kept, and I take responsibility for all the code in this repository. I can explain it, change it and debug it myself.
 
-## Tools used
+## Tool used
 
-- OpenAI Codex: code review guidance, debugging guidance, documentation drafting, Docker and CI troubleshooting, and learning support.
+- **OpenAI Codex**: code review, debugging help, drafting documentation, Docker and CI troubleshooting, and explanations of concepts I wanted to understand.
 
-## Areas where assistance was used
+## Where AI helped
 
-- Reviewing the FastAPI, React/Vite, Docker Compose, GitHub Actions, and documentation structure against the assessment requirements.
-- Explaining the architecture, authentication/authorization flow, Docker networking, and framework choices in terms the author can defend in a technical review.
-- Diagnosing Docker build/startup problems, including the frontend lockfile mismatch and Linux shell-script line-ending issue.
-- Drafting or improving documentation templates, test/checklist guidance, and the French study guide.
+- **Review:** checking my FastAPI, React/Vite, Docker Compose, GitHub Actions and documentation structure against the assessment requirements.
+- **Debugging:** finding the cause of two Docker problems, a frontend lockfile mismatch and Windows line endings (CRLF) breaking a Linux shell script.
+- **Documentation:** drafting and improving the Markdown files and the test checklist, plus a French study guide for my own revision.
 
-## Verification performed by the author
+## What I did myself
 
-- Ran the application locally with Docker Compose and verified the user workflow.
-- Reviewed generated code and configuration before retaining it.
-- Reviewed the verification commands in `TESTING.md`; the author must run every required command and record only the results actually observed before submission.
-- Reviewed CI failures and recorded the required remediation work in `SECURITY.md` and `docs/ASSESSMENT_TODO.md`.
+- Ran the application locally with Docker Compose and tested the full user workflow (register, log in, create projects and tasks).
+- Read every suggestion before keeping it, and changed what did not fit my project or what I did not understand.
+- Ran the commands listed in `TESTING.md` and recorded only the results I actually got.
+- Investigated the CI failures and recorded the fixes and remaining work in `SECURITY.md` and `docs/ASSESSMENT_TODO.md`.
 
-## Important limits
+## Limits
 
-- No real credentials, tokens, database dumps, or confidential information were intentionally shared with AI tools.
-- This disclosure must be updated if additional significant AI assistance is used before submission.
-- The author will be able to explain the final codebase and perform a small code change without AI during the follow-up review.
+- I did not knowingly share real credentials, tokens, database dumps or confidential data with the AI tool. My `.env` stays out of Git and out of prompts.
+- AI suggestions were sometimes wrong or did not match my code, so I checked them against the running application and the tests.
+- If I use AI significantly again before submitting, I will update this file and the log.
+- In the follow-up review I will be able to explain the codebase and make a small change without AI.
